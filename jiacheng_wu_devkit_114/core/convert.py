@@ -182,7 +182,7 @@ def convert_data(
 def parse_page_spec(spec: str) -> list[int]:
     """
     Parse a 1-indexed, comma/range page spec into a sorted, de-duplicated list of
-    0-indexed page numbers (the format pymupdf4llm.to_markdown()'s `pages=` expects).
+    0-indexed page numbers (the format pypdf's page indexing expects).
 
     Examples: "1-5" -> [0, 1, 2, 3, 4]; "1,3,7-9" -> [0, 2, 6, 7, 8]
 
@@ -223,31 +223,61 @@ def parse_page_spec(spec: str) -> list[int]:
     return sorted(pages)
 
 
-def pdf_to_markdown(input_path: Path, *, pages: str | None = None) -> str:
+def _extract_pages(input_path: Path, page_indices: list[int]) -> io.BytesIO:
     """
-    Convert a PDF to Markdown text via pymupdf4llm.to_markdown().
-
-    pages=None converts the whole document; otherwise parse_page_spec(pages) selects a
-    1-indexed subset (e.g. "1-5" or "1,3,7-9").
+    Extract the given 0-indexed pages from a PDF into an in-memory PDF buffer via pypdf.
 
     Raises:
-        ConversionError: if input_path doesn't exist, isn't a .pdf, or the underlying
-        pymupdf4llm conversion raises.
+        ConversionError: if any requested page index is out of range for the document.
+    """
+    from pypdf import PdfReader, PdfWriter
+
+    reader = PdfReader(str(input_path))
+    page_count = len(reader.pages)
+    out_of_range = [i + 1 for i in page_indices if i >= page_count]
+    if out_of_range:
+        raise ConversionError(f"Page(s) {out_of_range} out of range: {input_path} has {page_count} page(s).")
+
+    writer = PdfWriter()
+    for i in page_indices:
+        writer.add_page(reader.pages[i])
+
+    buffer = io.BytesIO()
+    writer.write(buffer)
+    buffer.seek(0)
+    return buffer
+
+
+def pdf_to_markdown(input_path: Path, *, pages: str | None = None) -> str:
+    """
+    Convert a PDF to Markdown text via markitdown.
+
+    pages=None converts the whole document; otherwise parse_page_spec(pages) selects a
+    1-indexed subset (e.g. "1-5" or "1,3,7-9") by first extracting just those pages into
+    an in-memory PDF via pypdf, then converting that subset.
+
+    Raises:
+        ConversionError: if input_path doesn't exist, isn't a .pdf, a requested page is out
+        of range, or the underlying conversion raises.
     """
     if not input_path.exists():
         raise ConversionError(f"PDF file not found: {input_path}")
     if input_path.suffix.lower() != ".pdf":
         raise ConversionError(f"Expected a .pdf file, got {input_path.suffix!r}: {input_path}")
 
-    # Imported lazily: pymupdf4llm is the heaviest dependency (pulls in numpy, onnxruntime),
+    # Imported lazily: markitdown pulls in a fairly heavy stack (onnxruntime, pillow, etc.),
     # and `convert data` / `batch` / `log` commands shouldn't pay its import cost at CLI startup.
-    import pymupdf4llm
+    from markitdown import MarkItDown, StreamInfo
 
-    kwargs: dict[str, Any] = {}
-    if pages is not None:
-        kwargs["pages"] = parse_page_spec(pages)
-
+    md = MarkItDown()
     try:
-        return pymupdf4llm.to_markdown(str(input_path), **kwargs)
+        if pages is None:
+            result = md.convert(str(input_path))
+        else:
+            buffer = _extract_pages(input_path, parse_page_spec(pages))
+            result = md.convert_stream(buffer, stream_info=StreamInfo(extension=".pdf", mimetype="application/pdf"))
+    except ConversionError:
+        raise
     except Exception as e:
         raise ConversionError(f"Failed to convert {input_path} to markdown: {e}") from e
+    return result.text_content

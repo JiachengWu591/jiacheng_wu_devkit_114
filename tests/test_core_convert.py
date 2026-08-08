@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
+
 import pytest
 
 from jiacheng_wu_devkit_114.core.convert import (
@@ -13,17 +15,8 @@ from jiacheng_wu_devkit_114.core.convert import (
 )
 from jiacheng_wu_devkit_114.core.errors import ConversionError
 
-
-def _make_pdf(path, page_texts):
-    """Build a minimal real PDF fixture on the fly (no binary asset committed to the repo)."""
-    import fitz  # PyMuPDF, installed as a dependency of pymupdf4llm
-
-    doc = fitz.open()
-    for text in page_texts:
-        page = doc.new_page()
-        page.insert_text((72, 72), text)
-    doc.save(path)
-    doc.close()
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
+TWO_PAGE_PDF = FIXTURES_DIR / "two_page_sample.pdf"
 
 
 # ------------------------------------------------------------------------------
@@ -256,10 +249,12 @@ def test_parse_page_spec_single_token_zero_raises():
 
 
 def test_pdf_to_markdown_wraps_underlying_failure(tmp_path):
-    # A .pdf file that isn't actually a valid PDF: pymupdf4llm should raise, and
-    # pdf_to_markdown must wrap that into a ConversionError rather than leaking it raw.
+    # A .pdf file with binary content that can't be parsed as a PDF (or gracefully
+    # reinterpreted as plain text, which markitdown's format sniffing falls back to for
+    # actually-text-like garbage). pdf_to_markdown must wrap the resulting failure into a
+    # ConversionError rather than leaking it raw.
     bad_pdf = tmp_path / "corrupt.pdf"
-    bad_pdf.write_bytes(b"not a real pdf")
+    bad_pdf.write_bytes(bytes([0xFF, 0xD8, 0x00, 0x01, 0x02, 0x03, 0xC0, 0xC1]) * 20)
     with pytest.raises(ConversionError):
         pdf_to_markdown(bad_pdf)
 
@@ -267,20 +262,21 @@ def test_pdf_to_markdown_wraps_underlying_failure(tmp_path):
 # ------------------------------------------------------------------------------
 # pdf_to_markdown
 # ------------------------------------------------------------------------------
-def test_pdf_to_markdown_full_document(tmp_path):
-    pdf_path = tmp_path / "sample.pdf"
-    _make_pdf(pdf_path, ["Page one content", "Page two content"])
-    md = pdf_to_markdown(pdf_path)
+def test_pdf_to_markdown_full_document():
+    md = pdf_to_markdown(TWO_PAGE_PDF)
     assert "Page one content" in md
     assert "Page two content" in md
 
 
-def test_pdf_to_markdown_page_subset(tmp_path):
-    pdf_path = tmp_path / "sample.pdf"
-    _make_pdf(pdf_path, ["Page one content", "Page two content"])
-    md = pdf_to_markdown(pdf_path, pages="1")
+def test_pdf_to_markdown_page_subset():
+    md = pdf_to_markdown(TWO_PAGE_PDF, pages="1")
     assert "Page one content" in md
     assert "Page two content" not in md
+
+
+def test_pdf_to_markdown_page_out_of_range_raises():
+    with pytest.raises(ConversionError, match="out of range"):
+        pdf_to_markdown(TWO_PAGE_PDF, pages="5")
 
 
 def test_pdf_to_markdown_missing_file_raises(tmp_path):

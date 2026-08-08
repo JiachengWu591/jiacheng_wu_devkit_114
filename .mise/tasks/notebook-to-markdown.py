@@ -5,19 +5,22 @@ Convert Jupyter notebooks in docs/source/ to Markdown files.
 """
 
 import subprocess
+import sys
 from pathlib import Path
 
 # Project root is two levels up from this script
 project_root = Path(__file__).parent.parent.parent
 dir_sphinx_doc_source = project_root / "docs" / "source"
-path_jupyter = project_root / ".venv" / "bin" / "jupyter"
 
 for path_notebook in dir_sphinx_doc_source.glob("**/*.ipynb"):
     if ".ipynb_checkpoints" in str(path_notebook):
         continue
     path_markdown = path_notebook.parent / "index.md"
+    # sys.executable -m nbconvert (rather than a hardcoded .venv/bin/jupyter path) works
+    # identically across platforms: Windows venvs use .venv/Scripts, not .venv/bin.
     args = [
-        str(path_jupyter),
+        sys.executable,
+        "-m",
         "nbconvert",
         "--to",
         "markdown",

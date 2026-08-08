@@ -45,7 +45,8 @@ classifiers = [
 # Core Dependencies
 # ------------------------------------------------------------------------------
 dependencies = [
-    "pymupdf4llm>=1.28.2",
+    "markitdown[pdf]>=0.1.7",
+    "pypdf>=6.15.0",
     "pyyaml>=6.0.3",
     "typer>=0.27.1",
 ]

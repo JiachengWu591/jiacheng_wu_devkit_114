@@ -89,7 +89,7 @@ def pdf2md_cmd(
     """
     Convert a PDF file to Markdown text.
 
-    Uses pymupdf4llm for CPU-only, no-model-download conversion. Layout fidelity (multi-column
+    Uses markitdown (MIT-licensed) for CPU-only conversion. Layout fidelity (multi-column
     pages, complex tables) is best-effort, not guaranteed.
 
     Examples:

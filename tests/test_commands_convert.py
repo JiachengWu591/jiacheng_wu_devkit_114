@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
+
 from typer.testing import CliRunner
 
 from jiacheng_wu_devkit_114.commands.convert import app
 
 runner = CliRunner()
+
+TWO_PAGE_PDF = Path(__file__).parent / "fixtures" / "two_page_sample.pdf"
 
 
 def test_help_lists_flatten_option():
@@ -63,19 +67,18 @@ def test_pdf2md_help_mentions_pages_option():
     assert "--pages" in result.stdout
 
 
-def test_pdf2md_full_document(tmp_path):
-    import fitz  # PyMuPDF
-
-    pdf_path = tmp_path / "sample.pdf"
-    doc = fitz.open()
-    page = doc.new_page()
-    page.insert_text((72, 72), "Hello from devkit")
-    doc.save(pdf_path)
-    doc.close()
-
-    result = runner.invoke(app, ["pdf2md", str(pdf_path)])
+def test_pdf2md_full_document():
+    result = runner.invoke(app, ["pdf2md", str(TWO_PAGE_PDF)])
     assert result.exit_code == 0
-    assert "Hello from devkit" in result.stdout
+    assert "Page one content" in result.stdout
+    assert "Page two content" in result.stdout
+
+
+def test_pdf2md_page_subset():
+    result = runner.invoke(app, ["pdf2md", str(TWO_PAGE_PDF), "--pages", "1"])
+    assert result.exit_code == 0
+    assert "Page one content" in result.stdout
+    assert "Page two content" not in result.stdout
 
 
 if __name__ == "__main__":
