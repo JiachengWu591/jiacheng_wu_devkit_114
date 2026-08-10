@@ -3,6 +3,7 @@ jiacheng_wu_devkit_114.egg-info/
 docs/source/**/index.md
 .claude/claude-code-message*
 tmp/
+tutorial/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
