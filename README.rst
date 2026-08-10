@@ -123,7 +123,28 @@ That's the core idea: ``devkit`` shows you exactly what it's about to do, and (o
 Command Reference
 --------------------------------------------------------------
 
-``devkit`` organizes everything into three command groups, documented below: ``devkit convert``, ``devkit batch``, and ``devkit log``.
+``devkit`` organizes everything into three command groups, documented below: ``devkit convert``, ``devkit batch``, and ``devkit log``. There's also a fourth, standalone command, ``devkit help``, that searches across all of them at once.
+
+devkit help
+--------------------------------------------------------------
+
+Run ``devkit help`` with no arguments to print a copy-paste-ready usage line for every
+subcommand across all three groups, or ``devkit help KEYWORD`` to search for one. Each line
+shows the command's actual signature (arguments, options, and defaults) rather than a
+description — every command's file argument is shown as the generic placeholder ``input``, and
+any ``--output``/``-o`` option as ``output``, so every row uses the same placeholder convention
+instead of each command's own differently-named metavar (``input_file``, ``logfile``,
+``src_dir``, ...). The keyword is matched case-insensitively against each command's name *and*
+its full help text, so it finds commands even when the keyword never appears in the group name —
+e.g. ``devkit help csv`` finds ``devkit convert data`` (csv is never in the word "convert"), and
+``devkit help traceback`` finds ``devkit log filter``.
+
+Example:
+
+.. code-block:: console
+
+    $ devkit help csv
+    devkit convert data input --to <json|yaml|csv> [--output/-o output] [--flatten]
 
 devkit convert
 --------------------------------------------------------------

@@ -8,6 +8,14 @@ x.y.z (Backlog)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Features and Improvements**
 
+- New ``devkit help [KEYWORD]`` command: prints a copy-paste-ready usage signature for every
+  subcommand across all three groups, or searches for one by keyword. Each command's file
+  argument is shown as the generic placeholder ``input`` and any ``--output``/``-o`` option as
+  ``output``, so every row uses the same placeholder convention instead of each command's own
+  metavar. With no keyword it lists everything; with a keyword it matches case-insensitively
+  against each command's name and full help text, so it finds a command even when the keyword
+  never appears in its group name (e.g. ``devkit help csv`` finds ``devkit convert data``).
+
 **Minor Improvements**
 
 **Bugfixes**

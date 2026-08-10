@@ -13,5 +13,6 @@ sub packages and modules
     batch <batch>
     convert <convert>
     errors <errors>
+    help <help>
     log <log>
     
