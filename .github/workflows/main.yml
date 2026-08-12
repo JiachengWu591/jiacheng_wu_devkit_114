@@ -67,9 +67,12 @@ jobs:
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
-      # Install project dependencies using uv (skip if cache hit)
+      # Install project dependencies using uv. Always runs, even on a cache hit: uv sync is
+      # fast/idempotent when .venv is already correct, and trusting the cache-hit flag alone
+      # is fragile--a cached .venv can reference a Python interpreter path that no longer
+      # exists on a fresh runner (observed: GitHub rotates the exact patch-version toolcache
+      # path), which silently skipped this step and left pytest itself uninstalled.
       - name: "Install dependencies"
-        if: steps.cache-venv.outputs.cache-hit != 'true'
         run: uv sync --extra test
       # Run pytest with coverage reporting
       - name: "Run pytest"
