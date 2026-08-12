@@ -6,6 +6,8 @@ from typer.testing import CliRunner
 
 from jiacheng_wu_devkit_114.commands.log import app
 
+from _helpers import strip_ansi
+
 runner = CliRunner()
 
 SAMPLE_LOG = """\
@@ -29,7 +31,7 @@ def _write_log(tmp_path):
 def test_filter_help_mentions_pattern_option():
     result = runner.invoke(app, ["filter", "--help"])
     assert result.exit_code == 0
-    assert "--pattern" in result.stdout
+    assert "--pattern" in strip_ansi(result.stdout)
 
 
 def test_filter_by_level(tmp_path):
@@ -67,7 +69,7 @@ def test_filter_missing_file_rejected():
 def test_stats_help_mentions_json_option():
     result = runner.invoke(app, ["stats", "--help"])
     assert result.exit_code == 0
-    assert "--json" in result.stdout
+    assert "--json" in strip_ansi(result.stdout)
 
 
 def test_stats_human_readable(tmp_path):

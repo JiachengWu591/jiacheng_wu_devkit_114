@@ -4,40 +4,45 @@ from typer.testing import CliRunner
 
 from jiacheng_wu_devkit_114.cli import app
 
+from _helpers import strip_ansi
+
 runner = CliRunner()
 
 
 def test_top_level_help_lists_three_groups():
     result = runner.invoke(app, ["--help"])
+    stdout = strip_ansi(result.stdout)
     assert result.exit_code == 0
     for name in ("convert", "batch", "log"):
-        assert name in result.stdout
+        assert name in stdout
 
 
 def test_convert_group_reachable_from_top_level():
     result = runner.invoke(app, ["convert", "--help"])
     assert result.exit_code == 0
-    assert "pdf2md" in result.stdout
+    assert "pdf2md" in strip_ansi(result.stdout)
 
 
 def test_batch_group_reachable_from_top_level():
     result = runner.invoke(app, ["batch", "--help"])
+    stdout = strip_ansi(result.stdout)
     assert result.exit_code == 0
-    assert "rename" in result.stdout
-    assert "organize" in result.stdout
+    assert "rename" in stdout
+    assert "organize" in stdout
 
 
 def test_log_group_reachable_from_top_level():
     result = runner.invoke(app, ["log", "--help"])
+    stdout = strip_ansi(result.stdout)
     assert result.exit_code == 0
-    assert "filter" in result.stdout
-    assert "stats" in result.stdout
+    assert "filter" in stdout
+    assert "stats" in stdout
 
 
 def test_top_level_help_mentions_help_command():
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    assert "devkit help" in result.stdout
+    assert "devkit help" in strip_ansi(result.stdout)
 
 
 def test_help_with_no_keyword_lists_every_command():

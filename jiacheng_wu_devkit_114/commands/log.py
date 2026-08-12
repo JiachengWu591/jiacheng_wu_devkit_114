@@ -125,7 +125,11 @@ def stats_cmd(
     stats = compute_stats(entries, group_by=group_by.value, top_n=top_n)
 
     if as_json:
-        console.print_json(json.dumps(stats))
+        # Plain print(), not console.print_json(): --json is documented as machine-readable
+        # output for scripts/AI agents, and Rich's print_json() applies JSON syntax
+        # highlighting whenever it detects color support—which some environments force on
+        # even for redirected/piped output, silently corrupting the JSON with ANSI codes.
+        print(json.dumps(stats))
         return
 
     for level_name, count in sorted(stats["level_counts"].items()):

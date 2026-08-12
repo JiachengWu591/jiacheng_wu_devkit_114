@@ -44,6 +44,16 @@ x.y.z (Backlog)
   printed: Rich's markup parser treats bare ``[word]`` as a style tag, and drops unrecognized
   ones rather than showing them as literal text. All error/status text is now escaped before
   being interpolated into a styled string.
+- ``devkit log stats --json`` used ``console.print_json()``, which applies Rich's JSON syntax
+  highlighting whenever it detects color support. Some environments (observed: GitHub
+  Actions' Ubuntu runner) force that on even for output a test/script captures
+  programmatically, splicing ANSI codes into what's documented as machine-readable output for
+  scripts/AI agents and breaking ``json.loads()`` on it. Switched to a plain ``print()`` for
+  this one output path, and disabled Rich's automatic content highlighting (``highlight=False``,
+  distinct from our own explicit ``[red]``/``[green]``/``[yellow]`` status-message tags, which
+  still render normally) on both console instances, since the same auto-highlighting could
+  splice codes into any other plain data output (a YAML/CSV value, a path) under the same
+  conditions.
 
 **Miscellaneous**
 

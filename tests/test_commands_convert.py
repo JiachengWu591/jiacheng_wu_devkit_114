@@ -6,6 +6,8 @@ from typer.testing import CliRunner
 
 from jiacheng_wu_devkit_114.commands.convert import app
 
+from _helpers import strip_ansi
+
 runner = CliRunner()
 
 TWO_PAGE_PDF = Path(__file__).parent / "fixtures" / "two_page_sample.pdf"
@@ -14,7 +16,7 @@ TWO_PAGE_PDF = Path(__file__).parent / "fixtures" / "two_page_sample.pdf"
 def test_help_lists_flatten_option():
     result = runner.invoke(app, ["data", "--help"])
     assert result.exit_code == 0
-    assert "flatten" in result.stdout
+    assert "flatten" in strip_ansi(result.stdout)
 
 
 def test_data_json_to_yaml(tmp_path):
@@ -64,7 +66,7 @@ def test_data_missing_input_file_rejected():
 def test_pdf2md_help_mentions_pages_option():
     result = runner.invoke(app, ["pdf2md", "--help"])
     assert result.exit_code == 0
-    assert "--pages" in result.stdout
+    assert "--pages" in strip_ansi(result.stdout)
 
 
 def test_pdf2md_full_document():

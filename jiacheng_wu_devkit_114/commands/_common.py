@@ -14,8 +14,15 @@ from rich.markup import escape
 
 from ..core.errors import DevkitError
 
-console = Console()
-err_console = Console(stderr=True)
+# highlight=False: Rich's Console auto-highlights patterns it recognizes (numbers, paths,
+# quoted strings, ...) in *any* printed text by default, even plain console.print(some_data)
+# calls with no markup tags of our own. That's meant for pretty interactive display, but it
+# means arbitrary command output (a YAML/CSV value, a filesystem path) can get ANSI codes
+# spliced into it whenever color support is detected—corrupting output a script or AI agent
+# expects to parse verbatim. Disabling it leaves our own explicit [red]/[green]/[yellow]
+# markup tags working normally; it only turns off the automatic guessing.
+console = Console(highlight=False)
+err_console = Console(stderr=True, highlight=False)
 
 
 def iter_leaf_commands(

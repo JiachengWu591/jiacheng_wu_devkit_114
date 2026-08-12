@@ -4,6 +4,8 @@ from typer.testing import CliRunner
 
 from jiacheng_wu_devkit_114.commands.batch import app
 
+from _helpers import strip_ansi
+
 runner = CliRunner()
 
 # windows_expand_args=False: CliRunner routes through Click's main() same as real usage,
@@ -17,9 +19,10 @@ INVOKE_KW = {"windows_expand_args": False}
 # ------------------------------------------------------------------------------
 def test_rename_help_mentions_dry_run_and_yes():
     result = runner.invoke(app, ["rename", "--help"], **INVOKE_KW)
+    stdout = strip_ansi(result.stdout)
     assert result.exit_code == 0
-    assert "--dry-run" in result.stdout
-    assert "--yes" in result.stdout
+    assert "--dry-run" in stdout
+    assert "--yes" in stdout
 
 
 def test_rename_dry_run_does_not_touch_files(tmp_path, monkeypatch):
@@ -98,7 +101,7 @@ def test_rename_dry_run_also_detects_collision(tmp_path, monkeypatch):
 def test_organize_help_mentions_by_option():
     result = runner.invoke(app, ["organize", "--help"])
     assert result.exit_code == 0
-    assert "--by" in result.stdout
+    assert "--by" in strip_ansi(result.stdout)
 
 
 def test_organize_dry_run_does_not_touch_files(tmp_path):
