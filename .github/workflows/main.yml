@@ -43,8 +43,13 @@ jobs:
       matrix:
         # Define the operating systems to test on
         os: ["ubuntu-latest", "windows-latest"]
-        # Define the Python versions to test with
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        # Define the Python versions to test with.
+        # 3.14 excluded for now: onnxruntime (a transitive dependency of markitdown[pdf],
+        # pulled in by the `test` extra to exercise `devkit convert pdf2md`) has no cp314
+        # wheel yet, so `uv sync --extra test` can't even install on 3.14. This blocks
+        # testing on 3.14, not devkit itself running on 3.14. Re-add once onnxruntime ships
+        # cp314 wheels.
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       # Check out the repository code to the runner
       - uses: "actions/checkout@v6" # https://github.com/marketplace/actions/checkout
