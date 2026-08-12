@@ -45,8 +45,7 @@ classifiers = [
 # Core Dependencies
 # ------------------------------------------------------------------------------
 dependencies = [
-    "markitdown[pdf]>=0.1.7",
-    "pypdf>=6.15.0",
+    "click>=8.1.0", # commands/_common.py introspects the Click command tree directly for `devkit help`
     "pyyaml>=6.0.3",
     "typer>=0.27.1",
 ]
@@ -61,6 +60,18 @@ dependencies = [
 [project.optional-dependencies]
 
 # ------------------------------------------------------------------------------
+# `devkit convert pdf2md` dependencies. These pull in a fairly heavy stack (onnxruntime,
+# numpy, magika, pillow, ...), so they're opt-in rather than required for every install:
+# `pip install jiacheng-wu-devkit-114[pdf]`. Without this extra, every other command
+# (convert data / batch / log) still works; only pdf2md needs it (and raises a clear
+# ConversionError pointing back here if it's missing).
+# ------------------------------------------------------------------------------
+pdf = [
+    "markitdown[pdf]>=0.1.7",
+    "pypdf>=6.15.0",
+]
+
+# ------------------------------------------------------------------------------
 # Local Development dependenceies
 # ------------------------------------------------------------------------------
 dev = [
@@ -71,6 +82,7 @@ dev = [
 # (Unit/Coverage/Integration/Load) Test dependenceies
 # ------------------------------------------------------------------------------
 test = [
+    "jiacheng_wu_devkit_114[pdf]", # pdf2md tests need markitdown/pypdf actually installed
     "pytest>=8.2.2,<9.0.0", # Testing framework
     "pytest-cov>=6.0.0,<7.0.0", # Coverage reporting
 ]

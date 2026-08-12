@@ -76,6 +76,22 @@ def test_rename_collision_refuses_and_touches_nothing(tmp_path, monkeypatch):
     assert not (tmp_path / "same.txt").exists()
 
 
+def test_rename_dry_run_also_detects_collision(tmp_path, monkeypatch):
+    # --dry-run must be a trustworthy preview: a plan that would be rejected for real must
+    # also be rejected (with a non-zero exit) under --dry-run, not silently look clean.
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "a.txt").write_text("a", encoding="utf-8")
+    (tmp_path / "b.txt").write_text("b", encoding="utf-8")
+
+    result = runner.invoke(app, ["rename", "*.txt", "--template", "same{ext}", "--dry-run"], **INVOKE_KW)
+
+    assert result.exit_code == 1
+    assert "would conflict" in result.output
+    assert (tmp_path / "a.txt").exists()
+    assert (tmp_path / "b.txt").exists()
+    assert not (tmp_path / "same.txt").exists()
+
+
 # ------------------------------------------------------------------------------
 # organize
 # ------------------------------------------------------------------------------
@@ -114,6 +130,21 @@ def test_organize_collision_refuses_and_touches_nothing(tmp_path):
     result = runner.invoke(app, ["organize", str(tmp_path), "--by", "ext", "--yes"])
 
     assert result.exit_code == 1
+    assert (tmp_path / "a.jpg").read_text(encoding="utf-8") == "a"
+    assert (tmp_path / "jpg" / "a.jpg").read_text(encoding="utf-8") == "pre-existing"
+
+
+def test_organize_dry_run_also_detects_collision(tmp_path):
+    # Same guarantee as rename: --dry-run must surface a collision that the real run would
+    # hit, not just print a plan that later turns out to be rejected.
+    (tmp_path / "a.jpg").write_text("a", encoding="utf-8")
+    (tmp_path / "jpg").mkdir()
+    (tmp_path / "jpg" / "a.jpg").write_text("pre-existing", encoding="utf-8")
+
+    result = runner.invoke(app, ["organize", str(tmp_path), "--by", "ext", "--dry-run"])
+
+    assert result.exit_code == 1
+    assert "would conflict" in result.output
     assert (tmp_path / "a.jpg").read_text(encoding="utf-8") == "a"
     assert (tmp_path / "jpg" / "a.jpg").read_text(encoding="utf-8") == "pre-existing"
 

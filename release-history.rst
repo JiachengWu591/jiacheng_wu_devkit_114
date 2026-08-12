@@ -18,7 +18,32 @@ x.y.z (Backlog)
 
 **Minor Improvements**
 
+- ``markitdown``/``pypdf`` (needed only by ``devkit convert pdf2md``) are no longer installed
+  by default — they're a heavy stack (onnxruntime, numpy, magika, ...) that most users of
+  ``convert data``/``batch``/``log`` never need. Install them with the new ``pdf`` extra:
+  ``pip install jiacheng-wu-devkit-114[pdf]``. Running ``pdf2md`` without it now raises a
+  clear ``ConversionError`` pointing to that install command, instead of a raw
+  ``ModuleNotFoundError`` traceback.
+
 **Bugfixes**
+
+- ``devkit batch rename``/``organize --dry-run`` now runs the collision check too, not just
+  the plan preview. Previously ``--dry-run`` returned right after printing the plan, before
+  ever calling the collision check, so a plan that would actually be rejected (two files
+  landing on the same destination, or an existing file in the way) could preview as if it
+  were clean under ``--dry-run`` and only fail once run for real. ``--dry-run`` now skips
+  only the interactive confirmation, so a clean ``--dry-run`` is a genuine guarantee.
+- ``commands/_common.py`` imports ``click`` directly (for ``devkit help``'s command-tree
+  introspection), but ``click`` was never declared as a dependency in ``pyproject.toml``—it
+  only happened to be present via some other package's transitive dependency in a full
+  ``--all-extras`` dev install, which masked a base install (``pip install
+  jiacheng-wu-devkit-114``) being completely broken (every command fails at import time with
+  ``ModuleNotFoundError: No module named 'click'``). Added it as an explicit dependency.
+- Error messages containing a literal ``[...]`` (e.g. the new "install it with ``pip install
+  jiacheng-wu-devkit-114[pdf]``" hint) were silently missing that bracketed text entirely when
+  printed: Rich's markup parser treats bare ``[word]`` as a style tag, and drops unrecognized
+  ones rather than showing them as literal text. All error/status text is now escaped before
+  being interpolated into a styled string.
 
 **Miscellaneous**
 

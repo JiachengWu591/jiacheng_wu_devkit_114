@@ -81,6 +81,17 @@ def test_pdf2md_page_subset():
     assert "Page two content" not in result.stdout
 
 
+def test_pdf2md_missing_extra_shows_bracketed_hint_literally(monkeypatch):
+    # Regression test: Rich's markup parser treats a bare "[pdf]" as an (unrecognized) style
+    # tag and silently drops it from the printed output entirely, rather than showing it as
+    # literal text, unless the message is escaped first. markitdown missing (no [pdf] extra
+    # installed) is exactly the error message that contains "[pdf]".
+    monkeypatch.setitem(__import__("sys").modules, "markitdown", None)
+    result = runner.invoke(app, ["pdf2md", str(TWO_PAGE_PDF)])
+    assert result.exit_code == 1
+    assert "[pdf]" in result.output
+
+
 if __name__ == "__main__":
     from jiacheng_wu_devkit_114.tests import run_cov_test
 

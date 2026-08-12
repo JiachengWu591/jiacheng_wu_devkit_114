@@ -223,14 +223,21 @@ def parse_page_spec(spec: str) -> list[int]:
     return sorted(pages)
 
 
+PDF_EXTRA_HINT = "Install it with: pip install jiacheng-wu-devkit-114[pdf]"
+
+
 def _extract_pages(input_path: Path, page_indices: list[int]) -> io.BytesIO:
     """
     Extract the given 0-indexed pages from a PDF into an in-memory PDF buffer via pypdf.
 
     Raises:
-        ConversionError: if any requested page index is out of range for the document.
+        ConversionError: if pypdf isn't installed, or any requested page index is out of
+        range for the document.
     """
-    from pypdf import PdfReader, PdfWriter
+    try:
+        from pypdf import PdfReader, PdfWriter
+    except ImportError as e:
+        raise ConversionError(f"PDF page selection requires pypdf. {PDF_EXTRA_HINT}") from e
 
     reader = PdfReader(str(input_path))
     page_count = len(reader.pages)
@@ -257,8 +264,8 @@ def pdf_to_markdown(input_path: Path, *, pages: str | None = None) -> str:
     an in-memory PDF via pypdf, then converting that subset.
 
     Raises:
-        ConversionError: if input_path doesn't exist, isn't a .pdf, a requested page is out
-        of range, or the underlying conversion raises.
+        ConversionError: if input_path doesn't exist, isn't a .pdf, markitdown isn't
+        installed, a requested page is out of range, or the underlying conversion raises.
     """
     if not input_path.exists():
         raise ConversionError(f"PDF file not found: {input_path}")
@@ -267,7 +274,13 @@ def pdf_to_markdown(input_path: Path, *, pages: str | None = None) -> str:
 
     # Imported lazily: markitdown pulls in a fairly heavy stack (onnxruntime, pillow, etc.),
     # and `convert data` / `batch` / `log` commands shouldn't pay its import cost at CLI startup.
-    from markitdown import MarkItDown, StreamInfo
+    # It's also an optional extra (see pyproject.toml [pdf]), not a base dependency, so a
+    # missing install is expected, not a bug—hence the friendly ConversionError instead of
+    # letting ModuleNotFoundError propagate raw.
+    try:
+        from markitdown import MarkItDown, StreamInfo
+    except ImportError as e:
+        raise ConversionError(f"PDF conversion requires markitdown. {PDF_EXTRA_HINT}") from e
 
     md = MarkItDown()
     try:

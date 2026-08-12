@@ -10,6 +10,7 @@ from typing import Callable, Iterator, Optional
 import click
 import typer
 from rich.console import Console
+from rich.markup import escape
 
 from ..core.errors import DevkitError
 
@@ -81,6 +82,11 @@ def catch_devkit_errors(func: Callable) -> Callable:
     """
     Decorator: catch DevkitError from the wrapped function, print it in red, and exit with code 1.
     Other exceptions (bugs) pass through untouched, showing full traceback.
+
+    The error text is passed through rich.markup.escape() before interpolation: error
+    messages routinely embed things like "[pdf]" or a Python list repr, and Rich's markup
+    parser would otherwise try to interpret bracketed text as style tags—an unrecognized tag
+    like "[pdf]" is silently dropped from the printed output entirely, not shown as literal text.
     """
 
     @wraps(func)
@@ -88,7 +94,7 @@ def catch_devkit_errors(func: Callable) -> Callable:
         try:
             return func(*args, **kwargs)
         except DevkitError as e:
-            err_console.print(f"[red]Error: {e}[/red]")
+            err_console.print(f"[red]Error: {escape(str(e))}[/red]")
             raise typer.Exit(code=1)
 
     return wrapper
@@ -100,6 +106,6 @@ def output_text(text: str, output_path: Optional[Path] = None) -> None:
     """
     if output_path:
         output_path.write_text(text, encoding="utf-8")
-        console.print(f"[green]Written to {output_path}[/green]")
+        console.print(f"[green]Written to {escape(str(output_path))}[/green]")
     else:
         console.print(text)

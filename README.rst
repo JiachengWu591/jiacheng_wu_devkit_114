@@ -57,12 +57,12 @@ guide: installation, a one-minute quick start, and the full command reference.
 中文文档: `README.zh-CN.rst <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/README.zh-CN.rst>`_
 
 
-.. _install:
-
 What is devkit
 --------------------------------------------------------------
 
 ``devkit`` is a small command-line toolkit that bundles three everyday file chores into a single tool, so you don't have to write a one-off script every time you need one of them. It has three independent command groups: ``convert`` (data format conversion between JSON/YAML/CSV, plus PDF-to-Markdown conversion), ``batch`` (batch-renaming and batch-organizing files), and ``log`` (filtering and summarizing plain-text log files). It's aimed at developers, sysadmins, and automation scripts (including AI agents) who want a dependable, scriptable utility for these common tasks without pulling in a bigger framework. This is a focused personal/example devkit, not a large framework — three practical utilities under one ``devkit`` command.
+
+.. _install:
 
 Installation
 --------------------------------------------------------------
@@ -80,6 +80,18 @@ This installs the ``devkit`` command on your ``PATH``. To verify the install wor
     $ devkit --help
 
 You should see a short usage summary that lists three command groups: ``convert``, ``batch``, and ``log``. If you see those three listed, the install succeeded and you're ready to go.
+
+The base install above covers ``convert data``, ``batch``, and ``log`` fully, but *not*
+``convert pdf2md`` — PDF conversion depends on a fairly heavy stack (``markitdown``, ``pypdf``,
+and everything they pull in), so it's an opt-in extra rather than something everyone has to
+install. If you need it, install with the ``pdf`` extra instead:
+
+.. code-block:: console
+
+    $ pip install "jiacheng-wu-devkit-114[pdf]"
+
+Running ``devkit convert pdf2md`` without this extra installed fails with a clear error telling
+you to install it — it won't crash with a raw Python traceback.
 
 Quick Start
 --------------------------------------------------------------
@@ -180,14 +192,15 @@ Examples:
 
 **devkit convert pdf2md**
 
-Run ``devkit convert pdf2md INPUT_FILE`` to convert a PDF file to Markdown text, using the `markitdown <https://github.com/microsoft/markitdown>`_ library under the hood (MIT-licensed, CPU-only conversion). Layout fidelity for multi-column pages or complex tables is best-effort, not guaranteed.
+Requires the ``pdf`` extra — ``pip install "jiacheng-wu-devkit-114[pdf]"`` — see `Installation`_
+above. Run ``devkit convert pdf2md INPUT_FILE`` to convert a PDF file to Markdown text, using the `markitdown <https://github.com/microsoft/markitdown>`_ library under the hood (MIT-licensed, CPU-only conversion). Layout fidelity for multi-column pages or complex tables is best-effort, not guaranteed.
 
 Options:
 
 - ``--output`` / ``-o``: write the resulting Markdown to a file instead of printing it to stdout. Optional.
 - ``--pages``: an optional, 1-indexed page selection. Accepts a single range like ``"1-5"``, a comma list like ``"1,3,7"``, or a mix like ``"1,3,7-9"``. Omit it to convert the whole document.
 
-An error is raised if the input file doesn't exist, doesn't end in ``.pdf``, or if ``--pages`` requests a page number beyond the document's actual page count.
+An error is raised if the input file doesn't exist, doesn't end in ``.pdf``, if the ``pdf`` extra isn't installed, or if ``--pages`` requests a page number beyond the document's actual page count.
 
 Examples:
 
@@ -216,7 +229,7 @@ Options:
   - ``{parent}`` — the name of the file's parent directory (just the directory's own name, not the full path).
 
   Using an unknown field name, or an invalid format spec, fails immediately with a clear error — before anything is renamed.
-- ``--dry-run``: print the rename plan and exit; nothing is renamed and no confirmation is asked. Note: this only prints the plan — it does **not** run the collision check described below, so a plan that looks clean under ``--dry-run`` can still be refused when you actually run it.
+- ``--dry-run``: print the rename plan and exit; nothing is renamed and no confirmation is asked. This still runs the full collision check described below, so a clean ``--dry-run`` guarantees the real run will succeed too.
 - ``--yes`` / ``-y``: skip the interactive confirmation prompt and rename immediately (the collision check below still runs first either way).
 
 Renaming happens in place — files stay in their current directory; only the filename changes.
@@ -241,7 +254,7 @@ Options:
 - ``--dest``: the root directory files get moved into. Defaults to ``SRC_DIR`` itself, so the result is ``SRC_DIR/<bucket>/<original filename>``.
 - ``--date-format``: an strftime pattern, used only when ``--by mtime``. Default: ``"%Y-%m"`` (e.g. ``"2026-08"``).
 - ``--recursive``: without it, only files directly inside ``SRC_DIR`` are considered, so files already sorted into subfolders by a previous run are left alone (safe to re-run). With ``--recursive``, files in subdirectories of ``SRC_DIR`` are included too.
-- ``--dry-run``: print the move plan and exit; nothing is moved and no confirmation is asked (and, as with ``rename``, the collision check itself does not run in this mode).
+- ``--dry-run``: print the move plan and exit; nothing is moved and no confirmation is asked. As with ``rename``, this still runs the full collision check, so a clean ``--dry-run`` guarantees the real run will succeed too.
 - ``--yes`` / ``-y``: skip the interactive confirmation prompt and move immediately.
 
 Examples:
@@ -318,10 +331,8 @@ Safety Notes & Tips
 **The batch safety net.** Both ``devkit batch rename`` and ``devkit batch organize`` work in three steps before they touch a single file:
 
 1. **Print the plan.** The full list of planned moves (old path -> new path) is always printed first, using each file's full absolute path — this happens even with ``--dry-run``.
-2. **Check for collisions.** Two files that would land on the same destination, or a destination that already exists on disk and isn't itself one of the plan's own source files, cause the command to refuse outright and make zero changes — not even a partial apply. Important: this check only runs when you are *not* using ``--dry-run``. ``--dry-run`` only prints the plan; it does not tell you whether the plan would actually be accepted. A plan that previews cleanly under ``--dry-run`` can still be rejected once you run it for real.
-3. **Ask for confirmation.** Unless ``--dry-run`` or ``--yes``/``-y`` was given, the command interactively asks "Rename N file(s)?" / "Move N file(s)?" and requires a yes answer. This happens *after* the collision check in step 2, so a colliding plan is rejected before you'd even be asked to confirm it.
-
-Since the collision check always runs on any non-``--dry-run`` invocation — including one with ``--yes`` — it's safe to run for real once you're satisfied with a ``--dry-run`` preview: if a collision exists, devkit will still catch it and refuse before touching any file.
+2. **Check for collisions.** Two files that would land on the same destination, or a destination that already exists on disk and isn't itself one of the plan's own source files, cause the command to refuse outright and make zero changes — not even a partial apply. This check runs even under ``--dry-run``, so a clean ``--dry-run`` is a genuine guarantee that the real run will be accepted too, not just a printout of the plan.
+3. **Ask for confirmation.** Unless ``--dry-run`` or ``--yes``/``-y`` was given, the command interactively asks "Rename N file(s)?" / "Move N file(s)?" and requires a yes answer. This is the *only* one of the three steps that ``--dry-run`` skips.
 
 **Always pass ``--yes`` in non-interactive contexts.** If you run ``devkit batch rename`` or ``devkit batch organize`` from a script, a CI pipeline, or an AI agent — anywhere with no human at a keyboard — the confirmation prompt from step 3 above will hang forever waiting on stdin that will never arrive. Always pass ``--yes`` (or ``-y``) in those contexts, or use ``--dry-run`` if you just want to inspect the plan.
 

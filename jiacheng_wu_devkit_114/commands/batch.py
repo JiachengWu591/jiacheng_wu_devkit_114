@@ -6,6 +6,8 @@ move-plan engine in core.batch and the same three-layer safety mechanism:
   2. Collisions (duplicate targets, or a target that already exists outside the plan)
      are checked before touching any file; if found, the command refuses outright.
   3. Without --dry-run or --yes, an interactive confirmation is required.
+--dry-run stops right after step 2, so a clean --dry-run really does mean the real run
+would succeed—it's a full preview, not just a printout of the plan.
 """
 
 from enum import Enum
@@ -62,7 +64,7 @@ def rename_cmd(
     ],
     dry_run: Annotated[
         bool,
-        typer.Option("--dry-run", help="Print the rename plan and exit; no files are touched."),
+        typer.Option("--dry-run", help="Print the rename plan (after checking for collisions) and exit; no files are touched."),
     ] = False,
     yes: Annotated[
         bool,
@@ -81,7 +83,8 @@ def rename_cmd(
 
     Files are numbered in sorted-path order starting at 1 ({seq}). The plan is always
     printed first. If any two files would land on the same target, or a target already
-    exists outside this plan, the command refuses and makes no changes.
+    exists outside this plan, the command refuses and makes no changes—this check runs even
+    under --dry-run, so a clean --dry-run guarantees the real run will succeed too.
 
     Examples:
 
@@ -97,15 +100,15 @@ def rename_cmd(
     plan = build_rename_plan(paths, template)
     _print_plan(plan)
 
-    if dry_run:
-        return
-
     collisions = find_collisions(plan)
     if collisions:
         raise BatchError(
             f"{len(collisions)} destination path(s) would conflict: "
             f"{[str(p) for p in collisions]}. Adjust --template or resolve manually."
         )
+
+    if dry_run:
+        return
 
     _confirm_or_abort(f"Rename {len(plan)} file(s)?", yes=yes)
 
@@ -138,7 +141,7 @@ def organize_cmd(
     ] = False,
     dry_run: Annotated[
         bool,
-        typer.Option("--dry-run", help="Print the organize plan and exit; no files are touched."),
+        typer.Option("--dry-run", help="Print the organize plan (after checking for collisions) and exit; no files are touched."),
     ] = False,
     yes: Annotated[
         bool,
@@ -157,7 +160,9 @@ def organize_cmd(
 
     Without --recursive, only files directly inside src_dir are considered (files already
     sorted into subfolders from a previous run are left alone). The plan is always printed
-    first; conflicting or pre-existing destinations abort the command with no changes made.
+    first; conflicting or pre-existing destinations abort the command with no changes made—
+    this check runs even under --dry-run, so a clean --dry-run guarantees the real run will
+    succeed too.
 
     Examples:
 
@@ -176,15 +181,15 @@ def organize_cmd(
     plan = build_organize_plan(paths, by=by.value, dest_root=dest_root, date_format=date_format)
     _print_plan(plan)
 
-    if dry_run:
-        return
-
     collisions = find_collisions(plan)
     if collisions:
         raise BatchError(
             f"{len(collisions)} destination path(s) would conflict: "
             f"{[str(p) for p in collisions]}. Resolve manually before retrying."
         )
+
+    if dry_run:
+        return
 
     _confirm_or_abort(f"Move {len(plan)} file(s)?", yes=yes)
 

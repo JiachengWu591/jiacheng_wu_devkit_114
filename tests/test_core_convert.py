@@ -279,6 +279,22 @@ def test_pdf_to_markdown_page_out_of_range_raises():
         pdf_to_markdown(TWO_PAGE_PDF, pages="5")
 
 
+def test_pdf_to_markdown_missing_markitdown_extra_raises_friendly_error(monkeypatch):
+    # markitdown is an optional extra (pyproject.toml [pdf]), not a base dependency, so a
+    # missing install must surface as a ConversionError with an install hint, not a raw
+    # ModuleNotFoundError. Simulate "not installed" by making the import fail.
+    monkeypatch.setitem(__import__("sys").modules, "markitdown", None)
+    with pytest.raises(ConversionError, match=r"pip install jiacheng-wu-devkit-114\[pdf\]"):
+        pdf_to_markdown(TWO_PAGE_PDF)
+
+
+def test_pdf_to_markdown_missing_pypdf_extra_raises_friendly_error(monkeypatch):
+    # Same as above, but for the pypdf import used only on the --pages subset path.
+    monkeypatch.setitem(__import__("sys").modules, "pypdf", None)
+    with pytest.raises(ConversionError, match=r"pip install jiacheng-wu-devkit-114\[pdf\]"):
+        pdf_to_markdown(TWO_PAGE_PDF, pages="1")
+
+
 def test_pdf_to_markdown_missing_file_raises(tmp_path):
     with pytest.raises(ConversionError):
         pdf_to_markdown(tmp_path / "missing.pdf")
