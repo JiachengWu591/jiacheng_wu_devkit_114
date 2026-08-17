@@ -27,6 +27,17 @@ x.y.z (Backlog)
 
 **Bugfixes**
 
+- Every GitHub URL in ``pyproject.toml`` (``Homepage``, ``Repository``, ``Issues``,
+  ``Changelog``) and in both READMEs and the maintainer guide pointed at
+  ``jiacheng_wu_devkit_114-project`` — a repo name that returns a real HTTP 404, since the
+  actual repo is ``jiacheng_wu_devkit_114`` (no ``-project`` suffix). Left over from the
+  cookiecutter template assuming the local folder name matches the GitHub repo name, which
+  isn't the case here. All of these (including the ones already live in the published
+  ``0.1.0`` package metadata on PyPI) now point at the real repo; fixing PyPI's own listing
+  requires publishing a new version. Also switched the Codecov badge's link to
+  ``app.codecov.io/github/...`` (not the legacy ``codecov.io/gh/...`` redirect chain), which
+  landed on an ambiguous "repository not found" / organization-picker page instead of going
+  straight to the report for a personal-account repo.
 - ``devkit batch rename``/``organize --dry-run`` now runs the collision check too, not just
   the plan preview. Previously ``--dry-run`` returned right after printing the plan, before
   ever calling the collision check, so a plan that would actually be rejected (two files

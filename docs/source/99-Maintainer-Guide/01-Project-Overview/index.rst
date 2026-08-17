@@ -8,7 +8,7 @@ This project is an **AI-First Python open source skeleton** — a carefully craf
 
 Dev Tool Manager — mise
 ------------------------------------------------------------------------------
-We use `mise (mise en place) <https://mise.jdx.dev>`_ to manage every developer tool in the project. The single source of truth is `mise.toml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/mise.toml>`_. Throughout this guide, whenever a new tool is introduced, we'll always point back to the corresponding entry in that file.
+We use `mise (mise en place) <https://mise.jdx.dev>`_ to manage every developer tool in the project. The single source of truth is `mise.toml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/mise.toml>`_. Throughout this guide, whenever a new tool is introduced, we'll always point back to the corresponding entry in that file.
 
 Why mise? Because managing tools across a dozen repos is painful — and mise solves it elegantly:
 
@@ -28,7 +28,7 @@ Package Manager — uv
 ------------------------------------------------------------------------------
 We use `uv <https://docs.astral.sh/uv/>`_ as the Python package manager. It is hands-down the fastest resolver and installer in the Python ecosystem — written in Rust, with dependency resolution that outpaces pip and poetry by orders of magnitude.
 
-All package metadata and dependencies live in `pyproject.toml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/pyproject.toml>`_. You never need to call ``uv`` directly — ``mise run inst`` handles it for you.
+All package metadata and dependencies live in `pyproject.toml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/pyproject.toml>`_. You never need to call ``uv`` directly — ``mise run inst`` handles it for you.
 
 - Lightning-fast installs (10–100x faster than pip in cold-cache scenarios)
 - Deterministic lockfile for reproducible environments
@@ -37,7 +37,7 @@ All package metadata and dependencies live in `pyproject.toml <https://github.co
 
 Coding Agent — Claude Code
 ------------------------------------------------------------------------------
-We treat Claude Code as a first-class member of the development workflow. The project ships with a `CLAUDE.md <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/CLAUDE.md>`_ file that tells Claude exactly how the project is structured — which tools are in use, how to run tasks, where tests live, and how to navigate the codebase.
+We treat Claude Code as a first-class member of the development workflow. The project ships with a `CLAUDE.md <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/CLAUDE.md>`_ file that tells Claude exactly how the project is structured — which tools are in use, how to run tasks, where tests live, and how to navigate the codebase.
 
 This means Claude can:
 
@@ -52,8 +52,8 @@ Unit Testing — pytest + Codecov
 ------------------------------------------------------------------------------
 Tests are written with `pytest <https://docs.pytest.org>`_ and tracked via `codecov.io <https://codecov.io>`_. The relevant config files are:
 
-- `codecov.yml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/codecov.yml>`_ — Codecov reporting configuration
-- `.coveragerc <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/.coveragerc>`_ — coverage measurement settings
+- `codecov.yml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/codecov.yml>`_ — Codecov reporting configuration
+- `.coveragerc <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/.coveragerc>`_ — coverage measurement settings
 
 A unique pattern used in this project: every test file can be run as a standalone script. The ``if __name__ == "__main__":`` block at the bottom of each test file invokes pytest as a subprocess, so you can iterate on a single test file in isolation without spinning up the full suite. Fast feedback, zero ceremony.
 
@@ -66,9 +66,9 @@ Run all tests with coverage in one shot:
 
 Documentation — Sphinx + Read the Docs
 ------------------------------------------------------------------------------
-Documentation is built with `Sphinx <https://www.sphinx-doc.org>`_ from source files in `docs/source/ <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/tree/main/docs/source>`_ and hosted automatically on `Read the Docs <https://readthedocs.org>`_.
+Documentation is built with `Sphinx <https://www.sphinx-doc.org>`_ from source files in `docs/source/ <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/tree/main/docs/source>`_ and hosted automatically on `Read the Docs <https://readthedocs.org>`_.
 
-The hosting config lives in `.readthedocs.yml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/.readthedocs.yml>`_ — push to ``main`` and your docs update automatically. No manual deploys needed.
+The hosting config lives in `.readthedocs.yml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/.readthedocs.yml>`_ — push to ``main`` and your docs update automatically. No manual deploys needed.
 
 Build docs locally with:
 
@@ -79,7 +79,7 @@ Build docs locally with:
 
 CI/CD — GitHub Actions
 ------------------------------------------------------------------------------
-Continuous integration runs on GitHub Actions, configured in `.github/workflows/main.yml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/.github/workflows/main.yml>`_.
+Continuous integration runs on GitHub Actions, configured in `.github/workflows/main.yml <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/.github/workflows/main.yml>`_.
 
 The pipeline runs a **matrix build** across multiple Python versions and operating systems — the gold standard for open source library compatibility testing. Every pull request and push to ``main`` triggers:
 

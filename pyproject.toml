@@ -114,11 +114,11 @@ mise = [
 
 # Quick Links
 [project.urls]
-Homepage = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project"
+Homepage = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114"
 Documentation = "https://jiacheng-wu-devkit-114.readthedocs.io/en/latest/"
-Repository = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project"
-Issues = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/issues"
-Changelog = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/release-history.rst"
+Repository = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114"
+Issues = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114/issues"
+Changelog = "https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/release-history.rst"
 Download = "https://pypi.org/pypi/jiacheng-wu-devkit-114#files"
 
 # For command line interface, read: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#creating-executable-scripts

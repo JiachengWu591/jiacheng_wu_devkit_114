@@ -3,11 +3,11 @@
     :target: https://jiacheng-wu-devkit-114.readthedocs.io/en/latest/
     :alt: Documentation Status
 
-.. image:: https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/actions/workflows/main.yml/badge.svg
-    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/actions?query=workflow:CI
+.. image:: https://github.com/JiachengWu591/jiacheng_wu_devkit_114/actions/workflows/main.yml/badge.svg
+    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114/actions?query=workflow:CI
 
-.. image:: https://codecov.io/gh/JiachengWu591/jiacheng_wu_devkit_114-project/branch/main/graph/badge.svg
-    :target: https://codecov.io/gh/JiachengWu591/jiacheng_wu_devkit_114-project
+.. image:: https://codecov.io/gh/JiachengWu591/jiacheng_wu_devkit_114/branch/main/graph/badge.svg
+    :target: https://app.codecov.io/github/JiachengWu591/jiacheng_wu_devkit_114
 
 .. image:: https://img.shields.io/pypi/v/jiacheng-wu-devkit-114.svg
     :target: https://pypi.python.org/pypi/jiacheng-wu-devkit-114
@@ -19,10 +19,10 @@
     :target: https://pypi.python.org/pypi/jiacheng-wu-devkit-114
 
 .. image:: https://img.shields.io/badge/✍️_Release_History!--None.svg?style=social&logo=github
-    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/release-history.rst
+    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/release-history.rst
 
 .. image:: https://img.shields.io/badge/⭐_Star_me_on_GitHub!--None.svg?style=social&logo=github
-    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project
+    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114
 
 ------
 
@@ -33,13 +33,13 @@
     :target: `install`_
 
 .. image:: https://img.shields.io/badge/Link-GitHub-blue.svg
-    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project
+    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114
 
 .. image:: https://img.shields.io/badge/Link-Submit_Issue-blue.svg
-    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/issues
+    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114/issues
 
 .. image:: https://img.shields.io/badge/Link-Request_Feature-blue.svg
-    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/issues
+    :target: https://github.com/JiachengWu591/jiacheng_wu_devkit_114/issues
 
 .. image:: https://img.shields.io/badge/Link-Download-blue.svg
     :target: https://pypi.org/pypi/jiacheng-wu-devkit-114#files
@@ -54,7 +54,7 @@ Welcome to ``jiacheng_wu_devkit_114`` Documentation
 renaming/organizing, and log filtering/summarizing. This page is a complete "from zero" user
 guide: installation, a one-minute quick start, and the full command reference.
 
-中文文档: `README.zh-CN.rst <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/README.zh-CN.rst>`_
+中文文档: `README.zh-CN.rst <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/README.zh-CN.rst>`_
 
 
 What is devkit

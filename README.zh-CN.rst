@@ -8,7 +8,7 @@
 ``devkit`` 是一个小巧的命令行工具箱,提供数据格式转换(JSON/YAML/CSV/PDF)、批量文件重命名与整理、
 日志过滤与汇总三类功能。本文档是从零开始的完整用户指南:安装、一分钟快速上手,以及完整的命令参考。
 
-English version: `README.rst <https://github.com/JiachengWu591/jiacheng_wu_devkit_114-project/blob/main/README.rst>`_
+English version: `README.rst <https://github.com/JiachengWu591/jiacheng_wu_devkit_114/blob/main/README.rst>`_
 
 
 devkit 是什么
